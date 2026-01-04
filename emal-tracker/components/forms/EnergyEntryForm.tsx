@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useEnergyStore } from '@/store/energyStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -66,10 +67,10 @@ export function EnergyEntryForm() {
       setStressFactor(undefined)
       setHadExercise(false)
 
-      alert('Energy level logged successfully!')
+      toast.success('Energy level logged successfully!')
     } catch (error) {
       console.error('Error adding entry:', error)
-      alert('Failed to log energy level')
+      toast.error('Failed to log energy level')
     } finally {
       setIsSubmitting(false)
     }

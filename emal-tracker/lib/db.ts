@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie';
 import type { EnergyEntry } from '@/types/energy';
 import type { SleepEntry } from '@/types/sleep';
 import type { ExerciseEntry } from '@/types/exercise';
-import type { StressEntry } from '@/types/stress';
+import type { StressEntry, StressLevelEntry } from '@/types/stress';
 import type { UserSettings } from '@/types/common';
 
 /**
@@ -14,6 +14,7 @@ export class EMALDatabase extends Dexie {
   sleepEntries!: Table<SleepEntry, string>;
   exerciseEntries!: Table<ExerciseEntry, string>;
   stressEntries!: Table<StressEntry, string>;
+  stressLevelEntries!: Table<StressLevelEntry, string>;
   settings!: Table<UserSettings, string>;
 
   constructor() {
@@ -25,6 +26,7 @@ export class EMALDatabase extends Dexie {
       sleepEntries: 'id, date, quality, duration, mood',
       exerciseEntries: 'id, date, type, intensity, duration',
       stressEntries: 'id, date, timestamp, type',
+      stressLevelEntries: 'id, date, stressLevel, timeOfDay',
       settings: 'id',
     });
   }

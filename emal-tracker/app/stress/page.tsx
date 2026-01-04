@@ -1,8 +1,21 @@
+"use client"
+
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { StressLogForm } from '@/components/forms/StressLogForm'
+import { StressLevelChart } from '@/components/charts/StressLevelChart'
+import { StressRecentEntries } from '@/components/layout/StressRecentEntries'
+import { useStressLevelStore } from '@/store/stressLevelStore'
 
 export default function StressPage() {
+  const { entries, loadEntries } = useStressLevelStore()
+
+  useEffect(() => {
+    loadEntries()
+  }, [loadEntries])
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -12,7 +25,29 @@ export default function StressPage() {
             Stress Management
           </h1>
           <p className="text-gray-600 mb-4">
-            Science-based tools to reduce stress and lower allostatic load. According to the EMAL model, stress can increase energy expenditure by 15-67%.
+            Track your stress levels and use science-based tools to reduce stress and lower allostatic load.
+          </p>
+        </div>
+
+        {/* Stress Tracking Section */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+          {/* Left Column: Form */}
+          <div>
+            <StressLogForm />
+          </div>
+
+          {/* Right Column: Chart and Recent Entries */}
+          <div className="space-y-6">
+            <StressLevelChart entries={entries} />
+            <StressRecentEntries entries={entries} limit={5} />
+          </div>
+        </div>
+
+        {/* Section Divider */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">Stress Management Tools</h2>
+          <p className="text-gray-600">
+            Use these science-based practices to actively reduce your stress
           </p>
         </div>
 

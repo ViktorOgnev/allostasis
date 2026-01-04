@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useExerciseStore } from '@/store/exerciseStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -49,7 +50,7 @@ export function ExerciseLogForm() {
         notes: notes || undefined,
       })
 
-      alert('Exercise logged successfully!')
+      toast.success('Exercise logged successfully!')
 
       // Reset some fields
       setDuration(30)
@@ -59,8 +60,8 @@ export function ExerciseLogForm() {
       setNotes('')
     } catch (error) {
       console.error('Error adding exercise entry:', error)
-      alert('Failed to log exercise')
-    } finally {
+      toast.error('Failed to log exercise')
+    } finally{
       setIsSubmitting(false)
     }
   }
@@ -134,7 +135,7 @@ export function ExerciseLogForm() {
               <input
                 type="range"
                 min="5"
-                max="180"
+                max="600"
                 step="5"
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
@@ -146,7 +147,7 @@ export function ExerciseLogForm() {
                   <span className="text-3xl font-bold text-blue-600">{duration}</span>
                   <span className="text-sm text-gray-600 ml-1">minutes</span>
                 </div>
-                <span className="text-xs text-gray-500">180 min</span>
+                <span className="text-xs text-gray-500">600 min (10h)</span>
               </div>
             </div>
           </div>

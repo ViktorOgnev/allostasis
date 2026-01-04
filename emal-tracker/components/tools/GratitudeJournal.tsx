@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useStressStore } from '@/store/stressStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -51,7 +52,7 @@ export function GratitudeJournal() {
     const filledItems = items.filter(item => item.trim() !== '')
 
     if (filledItems.length === 0) {
-      alert('Please add at least one gratitude item')
+      toast.error('Please add at least one gratitude item')
       return
     }
 
@@ -65,12 +66,12 @@ export function GratitudeJournal() {
         gratitudeItems: filledItems,
       })
 
-      alert('Gratitude entry saved!')
+      toast.success('Gratitude entry saved!')
       setItems(['', '', ''])
       getNewPrompt()
     } catch (error) {
       console.error('Error saving gratitude entry:', error)
-      alert('Failed to save gratitude entry')
+      toast.error('Failed to save gratitude entry')
     } finally {
       setIsSubmitting(false)
     }

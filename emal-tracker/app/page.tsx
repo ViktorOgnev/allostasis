@@ -1,118 +1,90 @@
+"use client"
+
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { DashboardOverview } from '@/components/dashboard/DashboardOverview'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import { GoalProgress } from '@/components/health/GoalProgress'
+import { useEnergyStore } from '@/store/energyStore'
+import { useSleepStore } from '@/store/sleepStore'
+import { useExerciseStore } from '@/store/exerciseStore'
+import { useStressLevelStore } from '@/store/stressLevelStore'
 
 export default function Home() {
+  // Load all data on mount
+  const loadEnergy = useEnergyStore((state) => state.loadEntries)
+  const loadSleep = useSleepStore((state) => state.loadEntries)
+  const loadExercise = useExerciseStore((state) => state.loadEntries)
+  const loadStress = useStressLevelStore((state) => state.loadEntries)
+
+  useEffect(() => {
+    loadEnergy()
+    loadSleep()
+    loadExercise()
+    loadStress()
+  }, [loadEnergy, loadSleep, loadExercise, loadStress])
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center max-w-3xl mx-auto mb-8">
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
             EMAL Fitness Tracker
           </h1>
-          <p className="text-xl text-gray-600 mb-4">
+          <p className="text-lg text-gray-600 mb-2">
             Energy Management & Allostatic Load
           </p>
-          <p className="text-gray-500 mb-8">
-            Science-based fitness tracker to optimize your energy through sleep, exercise, and stress management
+          <p className="text-sm text-gray-500">
+            Science-based fitness tracker to optimize your energy
           </p>
-          <Link href="/energy">
-            <Button size="lg" className="text-lg px-8">
-              Start Tracking Energy →
-            </Button>
-          </Link>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <Link href="/energy">
-            <Card className="hover:shadow-lg transition cursor-pointer h-full">
-              <CardHeader>
-                <div className="text-4xl mb-2">⚡</div>
-                <CardTitle>Energy Tracking</CardTitle>
-                <CardDescription>
-                  Monitor your daily energy levels and identify patterns
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+        {/* Quick Actions - Primary CTA */}
+        <QuickActions />
 
-          <Link href="/sleep">
-            <Card className="hover:shadow-lg transition cursor-pointer h-full">
-              <CardHeader>
-                <div className="text-4xl mb-2">😴</div>
-                <CardTitle>Sleep Tracking</CardTitle>
-                <CardDescription>
-                  Log sleep quality and get science-based tips
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+        {/* Dashboard Overview */}
+        <DashboardOverview />
 
-          <Link href="/exercise">
-            <Card className="hover:shadow-lg transition cursor-pointer h-full">
-              <CardHeader>
-                <div className="text-4xl mb-2">🏃</div>
-                <CardTitle>Exercise Logging</CardTitle>
-                <CardDescription>
-                  Track workouts and see their impact on energy
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+        {/* Weekly Goals Progress */}
+        <GoalProgress />
 
-          <Link href="/stress">
-            <Card className="hover:shadow-lg transition cursor-pointer h-full">
-              <CardHeader>
-                <div className="text-4xl mb-2">🧘</div>
-                <CardTitle>Stress Management</CardTitle>
-                <CardDescription>
-                  Practice breathing, gratitude, and mindfulness
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        </div>
-
-        {/* EMAL Model Explanation */}
-        <Card className="max-w-4xl mx-auto">
+        {/* About EMAL - Brief Summary */}
+        <Card className="max-w-4xl mx-auto mt-8">
           <CardHeader>
-            <CardTitle className="text-2xl">About the EMAL Model</CardTitle>
+            <CardTitle className="text-xl">About EMAL</CardTitle>
             <CardDescription>
-              Energy Management & Allostatic Load - A science-based approach to optimizing your wellbeing
+              Energy Management & Allostatic Load - Science-based approach to wellbeing
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">🔬 Energy Sources</h3>
-              <p className="text-sm text-gray-600">
-                Your body produces energy through ATP in mitochondria. Understanding and optimizing
-                this process is key to sustained energy throughout the day.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">📊 Energy Expenditure</h3>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Brain: ~20% of total energy</li>
-                <li>• Vital functions: breathing, heartbeat, digestion</li>
-                <li>• Allostasis (stress response): can increase energy use by 15-67%</li>
-                <li>• Growth & repair: cell regeneration and healing</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">💤 Sleep: 7-9 hours recommended</h3>
-              <p className="text-sm text-gray-600">
-                Sleep consolidates memory, saves 30-50% energy, and removes brain toxins through
-                the glymphatic system.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">🏋️ Exercise Benefits</h3>
-              <p className="text-sm text-gray-600">
-                Regular exercise increases mitochondria count, improves metabolic efficiency,
-                and boosts mood hormones. WHO recommends 300+ min moderate exercise weekly.
-              </p>
+          <CardContent>
+            <p className="text-sm text-gray-600 mb-4">
+              EMAL helps you understand how sleep, exercise, and stress management affect your daily energy levels.
+              Track these metrics to identify patterns and optimize your wellbeing.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <Link href="/energy">
+                <Button variant="outline" className="w-full">
+                  ⚡ Energy
+                </Button>
+              </Link>
+              <Link href="/sleep">
+                <Button variant="outline" className="w-full">
+                  😴 Sleep
+                </Button>
+              </Link>
+              <Link href="/exercise">
+                <Button variant="outline" className="w-full">
+                  🏃 Exercise
+                </Button>
+              </Link>
+              <Link href="/stress">
+                <Button variant="outline" className="w-full">
+                  🧘 Stress
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

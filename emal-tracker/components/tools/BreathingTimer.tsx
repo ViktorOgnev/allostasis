@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
+import { colors } from '@/app/design-tokens/colors'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -20,27 +22,27 @@ const breathingPatterns: Record<string, BreathingPattern> = {
     name: 'Box Breathing',
     description: 'Equal duration for all phases - promotes calmness and focus',
     phases: [
-      { name: 'Breathe In', duration: 8, instruction: 'Inhale slowly through your nose', color: '#3B82F6' },
-      { name: 'Hold', duration: 8, instruction: 'Hold your breath gently', color: '#8B5CF6' },
-      { name: 'Breathe Out', duration: 8, instruction: 'Exhale slowly through your mouth', color: '#10B981' },
-      { name: 'Hold', duration: 8, instruction: 'Hold your breath gently', color: '#F59E0B' },
+      { name: 'Breathe In', duration: 8, instruction: 'Inhale slowly through your nose', color: colors.primary },
+      { name: 'Hold', duration: 8, instruction: 'Hold your breath gently', color: colors.secondary },
+      { name: 'Breathe Out', duration: 8, instruction: 'Exhale slowly through your mouth', color: colors.success },
+      { name: 'Hold', duration: 8, instruction: 'Hold your breath gently', color: colors.warning },
     ],
   },
   '478': {
     name: '4-7-8 Breathing',
     description: 'Dr. Andrew Weil\'s technique for relaxation and sleep',
     phases: [
-      { name: 'Breathe In', duration: 8, instruction: 'Inhale quietly through your nose', color: '#3B82F6' },
-      { name: 'Hold', duration: 14, instruction: 'Hold your breath', color: '#8B5CF6' },
-      { name: 'Breathe Out', duration: 16, instruction: 'Exhale completely through your mouth', color: '#10B981' },
+      { name: 'Breathe In', duration: 8, instruction: 'Inhale quietly through your nose', color: colors.primary },
+      { name: 'Hold', duration: 14, instruction: 'Hold your breath', color: colors.secondary },
+      { name: 'Breathe Out', duration: 16, instruction: 'Exhale completely through your mouth', color: colors.success },
     ],
   },
   coherent: {
     name: 'Coherent Breathing',
     description: '10-10 breathing for heart rate variability and stress relief',
     phases: [
-      { name: 'Breathe In', duration: 10, instruction: 'Inhale slowly and deeply', color: '#3B82F6' },
-      { name: 'Breathe Out', duration: 10, instruction: 'Exhale slowly and completely', color: '#10B981' },
+      { name: 'Breathe In', duration: 10, instruction: 'Inhale slowly and deeply', color: colors.primary },
+      { name: 'Breathe Out', duration: 10, instruction: 'Exhale slowly and completely', color: colors.success },
     ],
   },
 }
@@ -84,7 +86,7 @@ export function BreathingTimer() {
 
   const startSession = () => {
     if (stressLevelBefore === null) {
-      alert('Please rate your stress level before starting')
+      toast.error('Please rate your stress level before starting')
       return
     }
     setIsActive(true)
