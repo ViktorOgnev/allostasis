@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useExerciseStore } from '@/store/exerciseStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import type { ExerciseType, ExerciseIntensity } from '@/types/exercise'
 
 const exerciseTypes: { value: ExerciseType; label: string; emoji: string }[] = [
@@ -177,92 +178,104 @@ export function ExerciseLogForm() {
             </div>
           </div>
 
-          {/* Energy Levels */}
-          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-            <h3 className="text-sm font-medium">Energy Impact</h3>
+          {/* Optional Details - Collapsible */}
+          <Accordion type="single" collapsible>
+            <AccordionItem value="details">
+              <AccordionTrigger className="text-sm font-medium">
+                Track Energy Impact (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  {/* Energy Levels */}
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+                    <h3 className="text-sm font-medium">Energy Impact</h3>
 
-            {/* Energy Before */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm text-gray-600">Energy Before</label>
-                <span className={`text-lg font-bold ${getEnergyColor(energyBefore)}`}>
-                  {energyBefore}/10
-                </span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={energyBefore}
-                onChange={(e) => setEnergyBefore(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
+                    {/* Energy Before */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <label className="text-sm text-gray-600">Energy Before</label>
+                        <span className={`text-lg font-bold ${getEnergyColor(energyBefore)}`}>
+                          {energyBefore}/10
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={energyBefore}
+                        onChange={(e) => setEnergyBefore(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
 
-            {/* Energy After */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm text-gray-600">Energy After</label>
-                <span className={`text-lg font-bold ${getEnergyColor(energyAfter)}`}>
-                  {energyAfter}/10
-                </span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={energyAfter}
-                onChange={(e) => setEnergyAfter(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
+                    {/* Energy After */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <label className="text-sm text-gray-600">Energy After</label>
+                        <span className={`text-lg font-bold ${getEnergyColor(energyAfter)}`}>
+                          {energyAfter}/10
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={energyAfter}
+                        onChange={(e) => setEnergyAfter(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
 
-            {/* Energy Difference */}
-            <div className="pt-3 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Energy Change:</span>
-                <div className="flex items-center gap-2">
-                  {energyDiff > 0 && (
-                    <span className="text-green-600 font-medium">
-                      ↑ +{energyDiff} points
-                    </span>
-                  )}
-                  {energyDiff === 0 && (
-                    <span className="text-gray-600 font-medium">
-                      → No change
-                    </span>
-                  )}
-                  {energyDiff < 0 && (
-                    <span className="text-red-600 font-medium">
-                      ↓ {energyDiff} points
-                    </span>
-                  )}
+                    {/* Energy Difference */}
+                    <div className="pt-3 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Energy Change:</span>
+                        <div className="flex items-center gap-2">
+                          {energyDiff > 0 && (
+                            <span className="text-green-600 font-medium">
+                              ↑ +{energyDiff} points
+                            </span>
+                          )}
+                          {energyDiff === 0 && (
+                            <span className="text-gray-600 font-medium">
+                              → No change
+                            </span>
+                          )}
+                          {energyDiff < 0 && (
+                            <span className="text-red-600 font-medium">
+                              ↓ {energyDiff} points
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {energyDiff > 0 && (
+                        <p className="text-xs text-green-600 mt-1">
+                          Great! Exercise boosted your energy
+                        </p>
+                      )}
+                      {energyDiff < 0 && (
+                        <p className="text-xs text-gray-600 mt-1">
+                          Normal for intense workouts - energy will recover
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Notes</label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Workout details, how you felt, achievements..."
+                      className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
+                      rows={3}
+                    />
+                  </div>
                 </div>
-              </div>
-              {energyDiff > 0 && (
-                <p className="text-xs text-green-600 mt-1">
-                  Great! Exercise boosted your energy
-                </p>
-              )}
-              {energyDiff < 0 && (
-                <p className="text-xs text-gray-600 mt-1">
-                  Normal for intense workouts - energy will recover
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes (Optional)</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Workout details, how you felt, achievements..."
-              className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
-              rows={3}
-            />
-          </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Weekly Progress */}
           <div className="bg-blue-50 p-4 rounded-lg">

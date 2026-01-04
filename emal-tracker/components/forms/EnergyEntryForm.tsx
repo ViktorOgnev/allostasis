@@ -6,6 +6,7 @@ import { useEnergyStore } from '@/store/energyStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import type { EnergyMood, EnergySleepFactor, EnergyStressFactor } from '@/types/energy'
 
 const moodOptions: { value: EnergyMood; label: string; emoji: string }[] = [
@@ -141,67 +142,79 @@ export function EnergyEntryForm() {
             </div>
           </div>
 
-          {/* Factors */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Contributing Factors (Optional)</label>
+          {/* Optional Details - Collapsible */}
+          <Accordion type="single" collapsible>
+            <AccordionItem value="details">
+              <AccordionTrigger className="text-sm font-medium">
+                More Details (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  {/* Factors */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Contributing Factors</label>
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* Sleep Quality */}
-              <div>
-                <label className="text-xs text-gray-600 mb-1 block">Sleep Quality</label>
-                <select
-                  value={sleepFactor || ''}
-                  onChange={(e) => setSleepFactor(e.target.value as EnergySleepFactor || undefined)}
-                  className="w-full p-2 border border-gray-200 rounded-md text-sm"
-                >
-                  <option value="">Not specified</option>
-                  <option value="poor">Poor</option>
-                  <option value="fair">Fair</option>
-                  <option value="good">Good</option>
-                  <option value="excellent">Excellent</option>
-                </select>
-              </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Sleep Quality */}
+                      <div>
+                        <label className="text-xs text-gray-600 mb-1 block">Sleep Quality</label>
+                        <select
+                          value={sleepFactor || ''}
+                          onChange={(e) => setSleepFactor(e.target.value as EnergySleepFactor || undefined)}
+                          className="w-full p-2 border border-gray-200 rounded-md text-sm"
+                        >
+                          <option value="">Not specified</option>
+                          <option value="poor">Poor</option>
+                          <option value="fair">Fair</option>
+                          <option value="good">Good</option>
+                          <option value="excellent">Excellent</option>
+                        </select>
+                      </div>
 
-              {/* Stress Level */}
-              <div>
-                <label className="text-xs text-gray-600 mb-1 block">Stress Level</label>
-                <select
-                  value={stressFactor || ''}
-                  onChange={(e) => setStressFactor(e.target.value as EnergyStressFactor || undefined)}
-                  className="w-full p-2 border border-gray-200 rounded-md text-sm"
-                >
-                  <option value="">Not specified</option>
-                  <option value="none">None</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-            </div>
+                      {/* Stress Level */}
+                      <div>
+                        <label className="text-xs text-gray-600 mb-1 block">Stress Level</label>
+                        <select
+                          value={stressFactor || ''}
+                          onChange={(e) => setStressFactor(e.target.value as EnergyStressFactor || undefined)}
+                          className="w-full p-2 border border-gray-200 rounded-md text-sm"
+                        >
+                          <option value="">Not specified</option>
+                          <option value="none">None</option>
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                        </select>
+                      </div>
+                    </div>
 
-            {/* Exercise */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={hadExercise}
-                onChange={(e) => setHadExercise(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300"
-              />
-              <span className="text-sm">I exercised today</span>
-            </label>
-          </div>
+                    {/* Exercise */}
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={hadExercise}
+                        onChange={(e) => setHadExercise(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      <span className="text-sm">I exercised today</span>
+                    </label>
+                  </div>
 
-          {/* Notes */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Notes (Optional)</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional context about your energy level..."
-              className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
-              rows={3}
-            />
-          </div>
+                  {/* Notes */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Notes</label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Any additional context about your energy level..."
+                      className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Submit Button */}
           <Button
