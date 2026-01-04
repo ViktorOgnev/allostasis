@@ -6,13 +6,19 @@ import { format } from 'date-fns'
 import { getEnergyColor, colors } from '@/app/design-tokens/colors'
 import type { EnergyEntry } from '@/types/energy'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartSkeleton } from './ChartSkeleton'
 
 interface EnergyLevelChartProps {
   entries: EnergyEntry[]
   days?: number
+  isLoading?: boolean
 }
 
-export function EnergyLevelChart({ entries, days = 7 }: EnergyLevelChartProps) {
+export function EnergyLevelChart({ entries, days = 7, isLoading = false }: EnergyLevelChartProps) {
+  if (isLoading) {
+    return <ChartSkeleton showHeader height={300} />
+  }
+
   const chartData = useMemo(() => {
     // Filter entries for the last N days
     const cutoffDate = new Date()

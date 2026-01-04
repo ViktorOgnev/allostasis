@@ -1,17 +1,24 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { Zap } from 'lucide-react'
 import { useEnergyStore } from '@/store/energyStore'
 import { EnergyEntryForm } from '@/components/forms/EnergyEntryForm'
 import { EnergyLevelChart } from '@/components/charts/EnergyLevelChart'
 import { RecentEntries } from '@/components/layout/RecentEntries'
+import { EmptyState } from '@/components/health/EmptyState'
 
 export default function EnergyPage() {
   const { entries, isLoading, loadEntries } = useEnergyStore()
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadEntries()
   }, [loadEntries])
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   if (isLoading) {
     return (
@@ -38,14 +45,28 @@ export default function EnergyPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Form */}
-          <div>
+          <div ref={formRef}>
             <EnergyEntryForm />
           </div>
 
-          {/* Right Column: Chart and Recent Entries */}
+          {/* Right Column: Chart and Recent Entries or Empty State */}
           <div className="space-y-6">
-            <EnergyLevelChart entries={entries} days={7} />
-            <RecentEntries entries={entries} limit={5} />
+            {entries.length === 0 ? (
+              <EmptyState
+                icon={<Zap className="w-12 h-12 text-blue-500" />}
+                title="No energy entries yet"
+                description="Start tracking your energy levels to discover patterns and optimize your day. Your first entry will appear here."
+                action={{
+                  label: "Log Your Energy →",
+                  onClick: scrollToForm
+                }}
+              />
+            ) : (
+              <>
+                <EnergyLevelChart entries={entries} days={7} isLoading={isLoading} />
+                <RecentEntries entries={entries} limit={5} />
+              </>
+            )}
           </div>
         </div>
 

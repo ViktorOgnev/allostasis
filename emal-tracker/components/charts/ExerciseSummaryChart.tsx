@@ -4,10 +4,12 @@ import { useMemo } from 'react'
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts'
 import { format, startOfWeek, endOfWeek, eachWeekOfInterval, subWeeks, isWithinInterval } from 'date-fns'
 import type { ExerciseEntry } from '@/types/exercise'
+import { ChartSkeleton } from './ChartSkeleton'
 
 interface ExerciseSummaryChartProps {
   entries: ExerciseEntry[]
   type?: 'weekly' | 'types' | 'energy' | 'all'
+  isLoading?: boolean
 }
 
 const EXERCISE_COLORS = {
@@ -26,7 +28,10 @@ const INTENSITY_COLORS = {
   vigorous: '#DC2626',  // dark red
 }
 
-export function ExerciseSummaryChart({ entries, type = 'all' }: ExerciseSummaryChartProps) {
+export function ExerciseSummaryChart({ entries, type = 'all', isLoading = false }: ExerciseSummaryChartProps) {
+  if (isLoading) {
+    return <ChartSkeleton showHeader={false} height={300} />
+  }
   // Calculate weekly totals for the last 8 weeks
   const weeklyData = useMemo(() => {
     const now = new Date()

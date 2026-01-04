@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { Dumbbell } from 'lucide-react'
 import { useExerciseStore } from '@/store/exerciseStore'
 import { ExerciseLogForm } from '@/components/forms/ExerciseLogForm'
 import { ExerciseSummaryChart } from '@/components/charts/ExerciseSummaryChart'
 import { RecentExerciseEntries } from '@/components/charts/RecentExerciseEntries'
+import { EmptyState } from '@/components/health/EmptyState'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,6 +15,7 @@ export default function ExercisePage() {
   const { entries, loadEntries } = useExerciseStore()
   const [isLoading, setIsLoading] = useState(true)
   const [chartView, setChartView] = useState<'all' | 'weekly' | 'types' | 'energy'>('all')
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const initializeData = async () => {
@@ -21,6 +24,10 @@ export default function ExercisePage() {
     }
     initializeData()
   }, [loadEntries])
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   if (isLoading) {
     return (
@@ -53,7 +60,7 @@ export default function ExercisePage() {
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
           {/* Exercise Log Form */}
-          <div>
+          <div ref={formRef}>
             <ExerciseLogForm />
           </div>
 
@@ -187,15 +194,27 @@ export default function ExercisePage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <ExerciseSummaryChart entries={entries} type={chartView} />
+                <ExerciseSummaryChart entries={entries} type={chartView} isLoading={isLoading} />
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Recent Entries */}
+        {/* Recent Entries or Empty State */}
         <div className="mb-8">
-          <RecentExerciseEntries entries={entries} limit={5} />
+          {entries.length === 0 ? (
+            <EmptyState
+              icon={<Dumbbell className="w-12 h-12 text-orange-500" />}
+              title="Log your first workout"
+              description="Start tracking your exercise to see patterns, monitor progress, and understand how workouts affect your energy. WHO recommends 300+ minutes per week."
+              action={{
+                label: "Log Workout →",
+                onClick: scrollToForm
+              }}
+            />
+          ) : (
+            <RecentExerciseEntries entries={entries} limit={5} />
+          )}
         </div>
 
         {/* EMAL Exercise Science */}

@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { Moon } from 'lucide-react'
 import { useSleepStore } from '@/store/sleepStore'
 import { SleepLogForm } from '@/components/forms/SleepLogForm'
 import { SleepQualityChart } from '@/components/charts/SleepQualityChart'
 import { RecentSleepEntries } from '@/components/charts/RecentSleepEntries'
+import { EmptyState } from '@/components/health/EmptyState'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,6 +15,7 @@ export default function SleepPage() {
   const { entries, loadEntries } = useSleepStore()
   const [isLoading, setIsLoading] = useState(true)
   const [chartView, setChartView] = useState<'combined' | 'duration' | 'quality'>('combined')
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const initializeData = async () => {
@@ -21,6 +24,10 @@ export default function SleepPage() {
     }
     initializeData()
   }, [loadEntries])
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   if (isLoading) {
     return (
@@ -53,7 +60,7 @@ export default function SleepPage() {
 
         <div className="grid lg:grid-cols-2 gap-6 mb-8">
           {/* Sleep Log Form */}
-          <div>
+          <div ref={formRef}>
             <SleepLogForm />
           </div>
 
@@ -177,15 +184,27 @@ export default function SleepPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <SleepQualityChart entries={entries} type={chartView} />
+                <SleepQualityChart entries={entries} type={chartView} isLoading={isLoading} />
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Recent Entries */}
+        {/* Recent Entries or Empty State */}
         <div className="mb-8">
-          <RecentSleepEntries entries={entries} limit={5} />
+          {entries.length === 0 ? (
+            <EmptyState
+              icon={<Moon className="w-12 h-12 text-purple-500" />}
+              title="Start tracking your sleep"
+              description="Log your first sleep entry to discover patterns and optimize your rest. Aim for 7-9 hours per night for optimal energy."
+              action={{
+                label: "Log Sleep →",
+                onClick: scrollToForm
+              }}
+            />
+          ) : (
+            <RecentSleepEntries entries={entries} limit={5} />
+          )}
         </div>
 
         {/* EMAL Sleep Science */}

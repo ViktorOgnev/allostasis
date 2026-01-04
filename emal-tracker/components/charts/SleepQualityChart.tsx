@@ -4,13 +4,18 @@ import { useMemo } from 'react'
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts'
 import { format } from 'date-fns'
 import type { SleepEntry } from '@/types/sleep'
+import { ChartSkeleton } from './ChartSkeleton'
 
 interface SleepQualityChartProps {
   entries: SleepEntry[]
   type?: 'duration' | 'quality' | 'combined'
+  isLoading?: boolean
 }
 
-export function SleepQualityChart({ entries, type = 'combined' }: SleepQualityChartProps) {
+export function SleepQualityChart({ entries, type = 'combined', isLoading = false }: SleepQualityChartProps) {
+  if (isLoading) {
+    return <ChartSkeleton showHeader={false} height={300} />
+  }
   const chartData = useMemo(() => {
     // Sort entries by date
     const sortedEntries = [...entries].sort((a, b) =>

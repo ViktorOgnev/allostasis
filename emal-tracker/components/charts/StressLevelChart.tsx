@@ -6,13 +6,18 @@ import { format } from 'date-fns'
 import { colors } from '@/app/design-tokens/colors'
 import type { StressLevelEntry } from '@/types/stress'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChartSkeleton } from './ChartSkeleton'
 
 interface StressLevelChartProps {
   entries: StressLevelEntry[]
   days?: number
+  isLoading?: boolean
 }
 
-export function StressLevelChart({ entries, days = 7 }: StressLevelChartProps) {
+export function StressLevelChart({ entries, days = 7, isLoading = false }: StressLevelChartProps) {
+  if (isLoading) {
+    return <ChartSkeleton showHeader height={300} />
+  }
   const chartData = useMemo(() => {
     // Filter entries for the last N days
     const cutoffDate = new Date()
