@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { Zap } from 'lucide-react'
 import { useEnergyStore } from '@/store/energyStore'
 import { EnergyEntryForm } from '@/components/forms/EnergyEntryForm'
 import { EnergyLevelChart } from '@/components/charts/EnergyLevelChart'
 import { RecentEntries } from '@/components/layout/RecentEntries'
 import { EmptyState } from '@/components/health/EmptyState'
+import { EnergyRing } from '@/components/health/EnergyRing'
 
 export default function EnergyPage() {
   const { entries, isLoading, loadEntries } = useEnergyStore()
@@ -19,6 +20,15 @@ export default function EnergyPage() {
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+
+  // Calculate latest energy level for EnergyRing
+  const latestEnergyLevel = useMemo(() => {
+    if (entries.length === 0) return 5
+    const sortedEntries = [...entries].sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )
+    return sortedEntries[0].energyLevel
+  }, [entries])
 
   if (isLoading) {
     return (
@@ -36,10 +46,20 @@ export default function EnergyPage() {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Energy Tracking</h1>
-          <p className="text-gray-600">
-            Monitor your energy levels and identify patterns
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Energy Tracking</h1>
+              <p className="text-gray-600">
+                Monitor your energy levels and identify patterns
+              </p>
+            </div>
+            {entries.length > 0 && (
+              <div className="flex flex-col items-center">
+                <p className="text-sm text-gray-500 mb-2">Latest Energy</p>
+                <EnergyRing level={latestEnergyLevel} size="md" showLabel={true} />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Main Content Grid */}

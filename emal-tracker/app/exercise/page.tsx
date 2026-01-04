@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { Dumbbell } from 'lucide-react'
 import { useExerciseStore } from '@/store/exerciseStore'
 import { ExerciseLogForm } from '@/components/forms/ExerciseLogForm'
 import { ExerciseSummaryChart } from '@/components/charts/ExerciseSummaryChart'
 import { RecentExerciseEntries } from '@/components/charts/RecentExerciseEntries'
 import { EmptyState } from '@/components/health/EmptyState'
+import { ProgressBar } from '@/components/health/ProgressBar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -28,6 +29,16 @@ export default function ExercisePage() {
   const scrollToForm = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+
+  // Calculate weekly exercise minutes for WHO goal
+  const weeklyMinutes = useMemo(() => {
+    const oneWeekAgo = new Date()
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+
+    return entries
+      .filter(entry => new Date(entry.date) >= oneWeekAgo)
+      .reduce((total, entry) => total + entry.duration, 0)
+  }, [entries])
 
   if (isLoading) {
     return (
@@ -113,35 +124,53 @@ export default function ExercisePage() {
               </CardContent>
             </Card>
 
-            {/* WHO Recommendations */}
+            {/* WHO Recommendations with Progress */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">WHO Guidelines</CardTitle>
+                <CardTitle className="text-lg">WHO Guidelines & Your Progress</CardTitle>
+                <CardDescription>Weekly exercise goal tracking</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <p className="font-medium text-sm text-green-900 mb-1">Moderate Exercise</p>
-                    <p className="text-2xl font-bold text-green-700 mb-1">300+ min/week</p>
-                    <p className="text-xs text-green-700">~43 minutes daily</p>
-                    <p className="text-xs text-gray-600 mt-2">
-                      Brisk walking, cycling, swimming, dancing
-                    </p>
-                  </div>
-                  <div className="bg-orange-50 p-3 rounded-lg">
-                    <p className="font-medium text-sm text-orange-900 mb-1">Vigorous Exercise</p>
-                    <p className="text-2xl font-bold text-orange-700 mb-1">150+ min/week</p>
-                    <p className="text-xs text-orange-700">~22 minutes daily</p>
-                    <p className="text-xs text-gray-600 mt-2">
-                      Running, HIIT, sports, intense cycling
-                    </p>
-                  </div>
-                  <div className="bg-purple-50 p-3 rounded-lg">
-                    <p className="font-medium text-sm text-purple-900 mb-1">Strength Training</p>
-                    <p className="text-2xl font-bold text-purple-700 mb-1">2+ days/week</p>
-                    <p className="text-xs text-gray-600 mt-2">
-                      All major muscle groups
-                    </p>
+                <div className="space-y-4">
+                  {/* Weekly Progress */}
+                  {entries.length > 0 && (
+                    <div className="pb-4 border-b border-gray-200">
+                      <ProgressBar
+                        current={weeklyMinutes}
+                        target={300}
+                        label="This Week's Progress"
+                        unit="min"
+                        showPercentage={true}
+                        height="md"
+                      />
+                    </div>
+                  )}
+
+                  {/* Guidelines */}
+                  <div className="space-y-3">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <p className="font-medium text-sm text-green-900 mb-1">Moderate Exercise</p>
+                      <p className="text-2xl font-bold text-green-700 mb-1">300+ min/week</p>
+                      <p className="text-xs text-green-700">~43 minutes daily</p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        Brisk walking, cycling, swimming, dancing
+                      </p>
+                    </div>
+                    <div className="bg-orange-50 p-3 rounded-lg">
+                      <p className="font-medium text-sm text-orange-900 mb-1">Vigorous Exercise</p>
+                      <p className="text-2xl font-bold text-orange-700 mb-1">150+ min/week</p>
+                      <p className="text-xs text-orange-700">~22 minutes daily</p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        Running, HIIT, sports, intense cycling
+                      </p>
+                    </div>
+                    <div className="bg-purple-50 p-3 rounded-lg">
+                      <p className="font-medium text-sm text-purple-900 mb-1">Strength Training</p>
+                      <p className="text-2xl font-bold text-purple-700 mb-1">2+ days/week</p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        All major muscle groups
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
