@@ -38,35 +38,41 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Card className="opacity-60">
-            <CardHeader>
-              <div className="text-4xl mb-2">😴</div>
-              <CardTitle>Sleep Tracking</CardTitle>
-              <CardDescription>
-                Log sleep quality and get science-based tips
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link href="/sleep">
+            <Card className="hover:shadow-lg transition cursor-pointer h-full">
+              <CardHeader>
+                <div className="text-4xl mb-2">😴</div>
+                <CardTitle>Sleep Tracking</CardTitle>
+                <CardDescription>
+                  Log sleep quality and get science-based tips
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
 
-          <Card className="opacity-60">
-            <CardHeader>
-              <div className="text-4xl mb-2">🏃</div>
-              <CardTitle>Exercise Logging</CardTitle>
-              <CardDescription>
-                Track workouts and see their impact on energy
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link href="/exercise">
+            <Card className="hover:shadow-lg transition cursor-pointer h-full">
+              <CardHeader>
+                <div className="text-4xl mb-2">🏃</div>
+                <CardTitle>Exercise Logging</CardTitle>
+                <CardDescription>
+                  Track workouts and see their impact on energy
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
 
-          <Card className="opacity-60">
-            <CardHeader>
-              <div className="text-4xl mb-2">🧘</div>
-              <CardTitle>Stress Management</CardTitle>
-              <CardDescription>
-                Practice breathing, gratitude, and mindfulness
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link href="/stress">
+            <Card className="hover:shadow-lg transition cursor-pointer h-full">
+              <CardHeader>
+                <div className="text-4xl mb-2">🧘</div>
+                <CardTitle>Stress Management</CardTitle>
+                <CardDescription>
+                  Practice breathing, gratitude, and mindfulness
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
         </div>
 
         {/* EMAL Model Explanation */}
