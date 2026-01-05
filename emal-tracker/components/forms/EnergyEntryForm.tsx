@@ -84,7 +84,35 @@ export function EnergyEntryForm() {
       toast.success('Energy level logged successfully!')
     } catch (error) {
       console.error('Error adding entry:', error)
-      toast.error('Failed to log energy level')
+
+      // Provide specific, actionable error messages
+      if (error instanceof Error) {
+        if (error.name === 'QuotaExceededError') {
+          toast.error('Storage is full', {
+            description: 'Go to Settings → Export and clear old data to free space.',
+            action: {
+              label: 'Go to Settings',
+              onClick: () => window.location.href = '/settings'
+            }
+          })
+        } else if (error.name === 'ConstraintError') {
+          toast.error('Duplicate entry detected', {
+            description: 'You already logged energy for this exact time. Try editing the existing entry or use a different time.'
+          })
+        } else {
+          toast.error('Failed to log energy level', {
+            description: 'Check your connection and try again. If problem persists, try refreshing the page.',
+            action: {
+              label: 'Retry',
+              onClick: () => handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+            }
+          })
+        }
+      } else {
+        toast.error('Failed to log energy level', {
+          description: 'An unexpected error occurred. Please try again.'
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }

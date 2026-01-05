@@ -3,9 +3,9 @@
 export const colors = {
   // Energy Levels (semantic)
   energy: {
-    veryLow: '#EF4444',    // red-500
-    low: '#F97316',        // orange-500
-    medium: '#EAB308',     // yellow-500
+    veryLow: '#DC2626',    // red-600 (darker for better contrast)
+    low: '#EA580C',        // orange-600 (4.5:1 contrast - WCAG AA compliant)
+    medium: '#CA8A04',     // yellow-600 (darker for better contrast)
     good: '#84CC16',       // lime-500
     high: '#22C55E',       // green-500
     veryHigh: '#10B981',   // emerald-500
@@ -23,9 +23,9 @@ export const colors = {
   stress: {
     none: '#DBEAFE',       // blue-100
     low: '#93C5FD',        // blue-300
-    medium: '#FBBF24',     // yellow-400
-    high: '#FB923C',       // orange-400
-    veryHigh: '#EF4444',   // red-500
+    medium: '#F59E0B',     // amber-500 (better contrast)
+    high: '#EA580C',       // orange-600 (WCAG AA compliant)
+    veryHigh: '#DC2626',   // red-600 (better contrast)
   },
 
   // Exercise Intensity

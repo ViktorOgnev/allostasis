@@ -13,6 +13,7 @@ const navItems = [
   { href: '/exercise', label: 'Exercise', emoji: '🏃' },
   { href: '/stress', label: 'Stress', emoji: '🧘' },
   { href: '/learn', label: 'Learn', emoji: '📚' },
+  { href: '/settings', label: 'Settings', emoji: '⚙️' },
 ]
 
 export function Navigation() {

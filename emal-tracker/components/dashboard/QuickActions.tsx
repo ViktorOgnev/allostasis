@@ -1,68 +1,38 @@
 "use client"
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { DailyCheckInForm } from '@/components/forms/DailyCheckInForm'
 
 interface QuickActionsProps {
   showDailyCheckIn?: boolean
-  onDailyCheckInClick?: () => void
 }
 
 export function QuickActions({
   showDailyCheckIn = true,
-  onDailyCheckInClick
 }: QuickActionsProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-  const handleDailyCheckInClick = () => {
-    if (onDailyCheckInClick) {
-      onDailyCheckInClick()
-    } else {
-      setIsDialogOpen(true)
-    }
-  }
-
   return (
     <div className="mb-8">
       {showDailyCheckIn && (
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white text-center mb-6">
-          <h2 className="text-2xl font-bold mb-2">Ready to track your day?</h2>
+          <h2 className="text-2xl font-bold mb-2">Ready to log your day?</h2>
           <p className="mb-4 text-blue-100">
-            Quick daily check-in takes just 30 seconds
+            Quick & easy - track all 4 metrics in one place
           </p>
-          <Button
-            onClick={handleDailyCheckInClick}
-            variant="secondary"
-            className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-6 text-lg"
-          >
-            ⚡ Quick Daily Check-In
-          </Button>
-
-          {/* Dialog for Daily Check-In Form */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Quick Daily Check-In</DialogTitle>
-                <DialogDescription>
-                  Track your energy, sleep, exercise, and stress in one place
-                </DialogDescription>
-              </DialogHeader>
-              <DailyCheckInForm onSuccess={() => setIsDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          <Link href="/log">
+            <Button
+              variant="secondary"
+              className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-6 text-lg"
+            >
+              📝 Start Daily Log
+            </Button>
+          </Link>
         </div>
       )}
 
       {/* Secondary Quick Actions */}
+      <div className="text-center mb-3">
+        <p className="text-sm text-gray-500">Or log individual metrics:</p>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link href="/energy">
           <Button

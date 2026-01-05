@@ -61,7 +61,26 @@ export function ExerciseLogForm() {
       setNotes('')
     } catch (error) {
       console.error('Error adding exercise entry:', error)
-      toast.error('Failed to log exercise')
+
+      if (error instanceof Error) {
+        if (error.name === 'QuotaExceededError') {
+          toast.error('Storage is full', {
+            description: 'Go to Settings → Export and clear old data.',
+            action: {
+              label: 'Settings',
+              onClick: () => window.location.href = '/settings'
+            }
+          })
+        } else {
+          toast.error('Failed to log exercise', {
+            description: 'Please check all fields and try again.',
+            action: {
+              label: 'Retry',
+              onClick: () => handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+            }
+          })
+        }
+      }
     } finally{
       setIsSubmitting(false)
     }

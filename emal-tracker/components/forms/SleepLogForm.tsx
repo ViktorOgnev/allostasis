@@ -105,7 +105,26 @@ export function SleepLogForm() {
       setStress(false)
     } catch (error) {
       console.error('Error adding sleep entry:', error)
-      toast.error('Failed to log sleep')
+
+      if (error instanceof Error) {
+        if (error.name === 'QuotaExceededError') {
+          toast.error('Storage is full', {
+            description: 'Go to Settings → Export and clear old data.',
+            action: {
+              label: 'Settings',
+              onClick: () => window.location.href = '/settings'
+            }
+          })
+        } else {
+          toast.error('Failed to log sleep', {
+            description: 'Please check your times are correct and try again.',
+            action: {
+              label: 'Retry',
+              onClick: () => handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+            }
+          })
+        }
+      }
     } finally {
       setIsSubmitting(false)
     }
