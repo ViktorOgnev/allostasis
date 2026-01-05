@@ -22,9 +22,13 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
   // Quick mode fields
   const [energyLevel, setEnergyLevel] = useState<number>(5)
   const [sleepQuality, setSleepQuality] = useState<1 | 2 | 3 | 4 | 5>(3)
+  const [bedtimeHour, setBedtimeHour] = useState<number>(22)
+  const [wakeTimeHour, setWakeTimeHour] = useState<number>(7)
   const [didExercise, setDidExercise] = useState<boolean>(false)
   const [exerciseDuration, setExerciseDuration] = useState<number>(30)
+  const [exerciseType, setExerciseType] = useState<'cardio' | 'strength' | 'flexibility' | 'walking' | 'sports' | 'other'>('cardio')
   const [stressLevel, setStressLevel] = useState<number>(5)
+  const [mainStressor, setMainStressor] = useState<string>('work')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -56,12 +60,12 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
       const yesterday = new Date(today)
       yesterday.setDate(today.getDate() - 1)
 
-      // Estimate bedtime and wake time based on quality
+      // Use user-selected bedtime and wake time
       const estimatedBedtime = new Date(yesterday)
-      estimatedBedtime.setHours(22, 0, 0, 0) // 10 PM default
+      estimatedBedtime.setHours(bedtimeHour, 0, 0, 0) // User-selected
 
       const estimatedWakeTime = new Date(today)
-      estimatedWakeTime.setHours(7, 0, 0, 0) // 7 AM default
+      estimatedWakeTime.setHours(wakeTimeHour, 0, 0, 0) // User-selected
 
       await addSleepEntry({
         date: yesterday,
@@ -76,7 +80,7 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
           date: today,
           startTime: now,
           duration: exerciseDuration,
-          type: 'other',
+          type: exerciseType, // User-selected
           intensity: 'moderate',
         })
       }
@@ -86,7 +90,7 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
         date: today,
         timeOfDay: now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening',
         stressLevel,
-        stressors: [],
+        stressors: stressLevel > 3 ? [mainStressor] : [], // User-selected if stress > 3
         copingStrategies: [],
       })
 
@@ -104,9 +108,13 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
       // Reset form
       setEnergyLevel(5)
       setSleepQuality(3)
+      setBedtimeHour(22)
+      setWakeTimeHour(7)
       setDidExercise(false)
       setExerciseDuration(30)
+      setExerciseType('cardio')
       setStressLevel(5)
+      setMainStressor('work')
 
       if (onSuccess) {
         onSuccess()
@@ -195,8 +203,10 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
         <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
           <label className="text-sm font-medium flex items-center gap-2 mb-3">
             <span className="text-2xl">😴</span>
-            Last Night's Sleep Quality
+            Last Night's Sleep
           </label>
+
+          {/* Quality Stars */}
           <div className="flex items-center gap-2 justify-center mb-3">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -213,7 +223,40 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
               </button>
             ))}
           </div>
-          <div className="text-center text-sm text-gray-600">
+
+          {/* Sleep Times */}
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <div>
+              <label className="text-xs text-gray-600 mb-1 block">Bedtime</label>
+              <select
+                value={bedtimeHour}
+                onChange={(e) => setBedtimeHour(Number(e.target.value))}
+                className="w-full p-2 border border-purple-200 rounded text-sm bg-white"
+              >
+                {Array.from({length: 24}, (_, i) => (
+                  <option key={i} value={i}>
+                    {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i-12} PM`}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-gray-600 mb-1 block">Wake time</label>
+              <select
+                value={wakeTimeHour}
+                onChange={(e) => setWakeTimeHour(Number(e.target.value))}
+                className="w-full p-2 border border-purple-200 rounded text-sm bg-white"
+              >
+                {Array.from({length: 24}, (_, i) => (
+                  <option key={i} value={i}>
+                    {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i-12} PM`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="text-center text-sm text-gray-600 mt-2">
             {sleepQuality === 1 && 'Poor'}
             {sleepQuality === 2 && 'Fair'}
             {sleepQuality === 3 && 'Good'}
@@ -248,17 +291,37 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
           </div>
 
           {didExercise && (
-            <div className="mt-4">
-              <label className="text-sm font-medium mb-2 block">
-                Duration: {exerciseDuration} minutes
-              </label>
-              <Slider
-                min={5}
-                max={180}
-                step={5}
-                value={exerciseDuration}
-                onChange={setExerciseDuration}
-              />
+            <div className="mt-4 space-y-3">
+              {/* Exercise Type */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Type</label>
+                <select
+                  value={exerciseType}
+                  onChange={(e) => setExerciseType(e.target.value as any)}
+                  className="w-full p-2 border border-green-200 rounded text-sm bg-white"
+                >
+                  <option value="cardio">🏃 Cardio</option>
+                  <option value="strength">💪 Strength</option>
+                  <option value="flexibility">🧘 Flexibility</option>
+                  <option value="walking">🚶 Walking</option>
+                  <option value="sports">⚽ Sports</option>
+                  <option value="other">🏋️ Other</option>
+                </select>
+              </div>
+
+              {/* Duration */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Duration: {exerciseDuration} minutes
+                </label>
+                <Slider
+                  min={5}
+                  max={180}
+                  step={5}
+                  value={exerciseDuration}
+                  onChange={setExerciseDuration}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -285,6 +348,27 @@ export function DailyCheckInForm({ onSuccess }: DailyCheckInFormProps) {
             value={stressLevel}
             onChange={setStressLevel}
           />
+
+          {/* Main Stressor - Conditional */}
+          {stressLevel > 3 && (
+            <div className="mt-3">
+              <label className="text-xs text-gray-600 mb-1 block">Main stressor?</label>
+              <select
+                value={mainStressor}
+                onChange={(e) => setMainStressor(e.target.value)}
+                className="w-full p-2 border border-orange-200 rounded text-sm bg-white"
+              >
+                <option value="work">Work/School</option>
+                <option value="relationships">Relationships</option>
+                <option value="health">Health</option>
+                <option value="finances">Finances</option>
+                <option value="family">Family</option>
+                <option value="deadlines">Deadlines</option>
+                <option value="sleep">Sleep deprivation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          )}
         </div>
       </div>
 

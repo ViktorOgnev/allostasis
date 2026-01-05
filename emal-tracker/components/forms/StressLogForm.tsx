@@ -6,6 +6,7 @@ import { useStressLevelStore } from '@/store/stressLevelStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { colors } from '@/app/design-tokens/colors'
 import type { TimeOfDay } from '@/types/stress'
 import { STRESSOR_OPTIONS, SYMPTOM_OPTIONS, COPING_STRATEGY_OPTIONS } from '@/types/stress'
@@ -20,6 +21,7 @@ export function StressLogForm() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('afternoon')
   const [stressLevel, setStressLevel] = useState<number>(5)
+  const [primaryStressor, setPrimaryStressor] = useState<string>('')
   const [selectedStressors, setSelectedStressors] = useState<string[]>([])
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([])
   const [selectedStrategies, setSelectedStrategies] = useState<string[]>([])
@@ -32,19 +34,24 @@ export function StressLogForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (selectedStressors.length === 0) {
-      toast.error('Please select at least one stressor')
+    if (!primaryStressor) {
+      toast.error('Please select a primary stressor')
       return
     }
 
     setIsSubmitting(true)
 
     try {
+      // Combine primary stressor with additional stressors
+      const allStressors = [primaryStressor, ...selectedStressors].filter((value, index, self) =>
+        self.indexOf(value) === index // Remove duplicates
+      )
+
       await addEntry({
         date: new Date(date),
         timeOfDay,
         stressLevel,
-        stressors: selectedStressors,
+        stressors: allStressors,
         physicalSymptoms: selectedSymptoms.length > 0 ? selectedSymptoms : undefined,
         copingStrategies: selectedStrategies.map(strategy => ({
           strategy,
@@ -57,6 +64,7 @@ export function StressLogForm() {
 
       // Reset form
       setStressLevel(5)
+      setPrimaryStressor('')
       setSelectedStressors([])
       setSelectedSymptoms([])
       setSelectedStrategies([])
@@ -181,102 +189,157 @@ export function StressLogForm() {
             </div>
           </div>
 
-          {/* Stressors */}
+          {/* Primary Stressor - Required */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
               What's causing stress? <span className="text-red-500">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-2">
-              {STRESSOR_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => toggleStressor(option.value)}
-                  className={`p-3 rounded-lg border-2 transition-all text-left ${
-                    selectedStressors.includes(option.value)
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{option.emoji}</span>
-                    <span className="text-sm font-medium">{option.label}</span>
+            <select
+              required
+              value={primaryStressor}
+              onChange={(e) => setPrimaryStressor(e.target.value)}
+              className="w-full p-2 border border-gray-200 rounded-md"
+            >
+              <option value="">Select primary stressor...</option>
+              <option value="work">💼 Work/Deadlines</option>
+              <option value="relationships">❤️ Relationships</option>
+              <option value="financial">💰 Financial Concerns</option>
+              <option value="health">🏥 Health Concerns</option>
+              <option value="family">👨‍👩‍👧‍👦 Family Responsibilities</option>
+              <option value="social">👥 Social Obligations</option>
+              <option value="commute">🚗 Traffic/Commute</option>
+              <option value="technology">💻 Technology Issues</option>
+              <option value="sleep">😴 Lack of Sleep</option>
+              <option value="diet">🍔 Poor Diet</option>
+              <option value="exercise">🏃 Lack of Exercise</option>
+              <option value="other">🔄 Other</option>
+            </select>
+          </div>
+
+          {/* Additional Details - Accordion */}
+          <Accordion type="single" collapsible>
+            {/* Additional Stressors */}
+            <AccordionItem value="more-stressors">
+              <AccordionTrigger className="text-sm font-medium">
+                Additional Stressors (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs text-gray-500 mb-3">
+                    Select any other stressors you're experiencing:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {STRESSOR_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => toggleStressor(option.value)}
+                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                          selectedStressors.includes(option.value)
+                            ? 'border-orange-500 bg-orange-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{option.emoji}</span>
+                          <span className="text-sm font-medium">{option.label}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Physical Symptoms (Optional) */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Physical Symptoms (Optional)</label>
-            <div className="grid grid-cols-2 gap-2">
-              {SYMPTOM_OPTIONS.map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex items-center gap-2 p-2 rounded cursor-pointer border-2 transition-all ${
-                    selectedSymptoms.includes(option.value)
-                      ? 'border-red-400 bg-red-50'
-                      : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedSymptoms.includes(option.value)}
-                    onChange={() => toggleSymptom(option.value)}
-                    className="w-4 h-4 rounded border-gray-300"
-                  />
-                  <span className="text-lg">{option.emoji}</span>
-                  <span className="text-sm">{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Coping Strategies (Optional) */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Coping Strategies Used (Optional)</label>
-            <div className="space-y-2">
-              {COPING_STRATEGY_OPTIONS.map((option) => (
-                <div key={option.value} className="space-y-2">
-                  <label
-                    className={`flex items-center gap-2 p-3 rounded cursor-pointer border-2 transition-all ${
-                      selectedStrategies.includes(option.value)
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedStrategies.includes(option.value)}
-                      onChange={() => toggleStrategy(option.value)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-xl">{option.emoji}</span>
-                    <span className="text-sm font-medium flex-1">{option.label}</span>
-                  </label>
-
-                  {selectedStrategies.includes(option.value) && option.hasDuration && (
-                    <div className="ml-8 flex items-center gap-2">
-                      <label className="text-xs text-gray-600">Duration (min):</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="120"
-                        value={strategyDurations[option.value] || ''}
-                        onChange={(e) => setStrategyDurations(prev => ({
-                          ...prev,
-                          [option.value]: Number(e.target.value)
-                        }))}
-                        className="w-20 p-1 border border-gray-200 rounded text-sm"
-                        placeholder="10"
-                      />
-                    </div>
-                  )}
                 </div>
-              ))}
-            </div>
-          </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Physical Symptoms */}
+            <AccordionItem value="symptoms">
+              <AccordionTrigger className="text-sm font-medium">
+                Physical Symptoms (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs text-gray-500 mb-3">
+                    Any physical symptoms you're noticing?
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {SYMPTOM_OPTIONS.map((option) => (
+                      <label
+                        key={option.value}
+                        className={`flex items-center gap-2 p-2 rounded cursor-pointer border-2 transition-all ${
+                          selectedSymptoms.includes(option.value)
+                            ? 'border-red-400 bg-red-50'
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSymptoms.includes(option.value)}
+                          onChange={() => toggleSymptom(option.value)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-lg">{option.emoji}</span>
+                        <span className="text-sm">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Coping Strategies */}
+            <AccordionItem value="coping">
+              <AccordionTrigger className="text-sm font-medium">
+                Coping Strategies Used (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs text-gray-500 mb-3">
+                    What helped you manage stress?
+                  </p>
+                  <div className="space-y-2">
+                    {COPING_STRATEGY_OPTIONS.map((option) => (
+                      <div key={option.value} className="space-y-2">
+                        <label
+                          className={`flex items-center gap-2 p-3 rounded cursor-pointer border-2 transition-all ${
+                            selectedStrategies.includes(option.value)
+                              ? 'border-green-500 bg-green-50'
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedStrategies.includes(option.value)}
+                            onChange={() => toggleStrategy(option.value)}
+                            className="w-4 h-4 rounded border-gray-300"
+                          />
+                          <span className="text-xl">{option.emoji}</span>
+                          <span className="text-sm font-medium flex-1">{option.label}</span>
+                        </label>
+
+                        {selectedStrategies.includes(option.value) && option.hasDuration && (
+                          <div className="ml-8 flex items-center gap-2">
+                            <label className="text-xs text-gray-600">Duration (min):</label>
+                            <input
+                              type="number"
+                              min="1"
+                              max="120"
+                              value={strategyDurations[option.value] || ''}
+                              onChange={(e) => setStrategyDurations(prev => ({
+                                ...prev,
+                                [option.value]: Number(e.target.value)
+                              }))}
+                              className="w-20 p-1 border border-gray-200 rounded text-sm"
+                              placeholder="10"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Notes */}
           <div className="space-y-2">

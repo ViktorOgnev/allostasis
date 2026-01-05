@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useSleepStore } from '@/store/sleepStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import type { SleepQuality, SleepMood } from '@/types/sleep'
 import { calculateSleepDuration } from '@/lib/utils'
 
@@ -24,7 +25,6 @@ const moodOptions: { value: SleepMood; label: string; emoji: string }[] = [
 ]
 
 export function SleepLogForm() {
-  const [mode, setMode] = useState<'quick' | 'detailed'>('quick')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [bedtime, setBedtime] = useState('22:00')
   const [wakeTime, setWakeTime] = useState('07:00')
@@ -133,28 +133,6 @@ export function SleepLogForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Mode Toggle */}
-        <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-lg w-fit">
-          <Button
-            type="button"
-            variant={mode === 'quick' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setMode('quick')}
-            className="transition-all"
-          >
-            ⚡ Quick Mode
-          </Button>
-          <Button
-            type="button"
-            variant={mode === 'detailed' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setMode('detailed')}
-            className="transition-all"
-          >
-            📋 Detailed Mode
-          </Button>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Date */}
           <div className="space-y-2">
@@ -230,120 +208,127 @@ export function SleepLogForm() {
             </div>
           </div>
 
-          {/* Detailed Mode Fields */}
-          {mode === 'detailed' && (
-            <>
-              {/* Mood on Waking */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">How did you feel waking up?</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {moodOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setMood(option.value)}
-                      className={`p-3 rounded-lg border-2 transition-all ${
-                        mood === option.value
-                          ? 'border-gray-900 bg-gray-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="text-2xl mb-1">{option.emoji}</div>
-                      <div className="text-xs">{option.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+          {/* Optional Details - Accordion */}
+          <Accordion type="single" collapsible>
+            <AccordionItem value="details">
+              <AccordionTrigger className="text-sm font-medium">
+                More Details (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-6 pt-2">
+                  {/* Mood on Waking */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">How did you feel waking up?</label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {moodOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setMood(option.value)}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            mood === option.value
+                              ? 'border-gray-900 bg-gray-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="text-2xl mb-1">{option.emoji}</div>
+                          <div className="text-xs">{option.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Additional Details */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Time to Fall Asleep (min)</label>
-                  <input
-                    type="number"
-                    value={fellAsleepTime}
-                    onChange={(e) => setFellAsleepTime(Number(e.target.value))}
-                    min="0"
-                    className="w-full p-2 border border-gray-200 rounded-md"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Night Interruptions</label>
-                  <input
-                    type="number"
-                    value={interruptions}
-                    onChange={(e) => setInterruptions(Number(e.target.value))}
-                    min="0"
-                    className="w-full p-2 border border-gray-200 rounded-md"
-                  />
-                </div>
-              </div>
+                  {/* Additional Details */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Time to Fall Asleep (min)</label>
+                      <input
+                        type="number"
+                        value={fellAsleepTime}
+                        onChange={(e) => setFellAsleepTime(Number(e.target.value))}
+                        min="0"
+                        className="w-full p-2 border border-gray-200 rounded-md"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Night Interruptions</label>
+                      <input
+                        type="number"
+                        value={interruptions}
+                        onChange={(e) => setInterruptions(Number(e.target.value))}
+                        min="0"
+                        className="w-full p-2 border border-gray-200 rounded-md"
+                      />
+                    </div>
+                  </div>
 
-              {/* Sleep Factors */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium">Factors That May Have Affected Sleep</label>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={hadCaffeine}
-                      onChange={(e) => setHadCaffeine(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">☕ Caffeine after 2pm</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={hadAlcohol}
-                      onChange={(e) => setHadAlcohol(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">🍷 Alcohol consumption</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={lateExercise}
-                      onChange={(e) => setLateExercise(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">🏃 Exercise within 2h of bedtime</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={screenTime}
-                      onChange={(e) => setScreenTime(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">📱 Screen time within 1h of bedtime</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={stress}
-                      onChange={(e) => setStress(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <span className="text-sm">😰 Stress or anxiety</span>
-                  </label>
+                  {/* Sleep Factors */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Factors That May Have Affected Sleep</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={hadCaffeine}
+                          onChange={(e) => setHadCaffeine(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">☕ Caffeine after 2pm</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={hadAlcohol}
+                          onChange={(e) => setHadAlcohol(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">🍷 Alcohol consumption</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={lateExercise}
+                          onChange={(e) => setLateExercise(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">🏃 Exercise within 2h of bedtime</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={screenTime}
+                          onChange={(e) => setScreenTime(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">📱 Screen time within 1h of bedtime</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-gray-50">
+                        <input
+                          type="checkbox"
+                          checked={stress}
+                          onChange={(e) => setStress(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm">😰 Stress or anxiety</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
-              {/* Notes */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Notes (Optional)</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Any dreams, disturbances, or other observations..."
-                  className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
-                  rows={3}
-                />
-              </div>
-            </>
-          )}
+          {/* Notes */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Notes (Optional)</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Any dreams, disturbances, or other observations..."
+              className="w-full p-3 border border-gray-200 rounded-md text-sm resize-none"
+              rows={3}
+            />
+          </div>
 
           {/* Submit Button */}
           <Button
