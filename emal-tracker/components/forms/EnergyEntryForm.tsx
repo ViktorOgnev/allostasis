@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { DateTimeInput } from '@/components/forms/DateTimeInput'
+import { getDefaultFormDate, getDefaultFormTime, formDateTimeToDate, formDateToDate } from '@/lib/dateUtils'
 import type { EnergyMood, EnergySleepFactor, EnergyStressFactor } from '@/types/energy'
 
 const moodOptions: { value: EnergyMood; label: string; emoji: string }[] = [
@@ -18,6 +20,10 @@ const moodOptions: { value: EnergyMood; label: string; emoji: string }[] = [
 ]
 
 export function EnergyEntryForm() {
+  // Date & Time state - defaults to NOW
+  const [date, setDate] = useState(getDefaultFormDate())
+  const [time, setTime] = useState(getDefaultFormTime())
+
   const [energyLevel, setEnergyLevel] = useState(5)
   const [mood, setMood] = useState<EnergyMood>('neutral')
   const [notes, setNotes] = useState('')
@@ -47,9 +53,13 @@ export function EnergyEntryForm() {
     setIsSubmitting(true)
 
     try {
+      // Combine date and time into full timestamp
+      const timestamp = formDateTimeToDate(date, time)
+      const entryDate = formDateToDate(date)
+
       await addEntry({
-        date: new Date(),
-        timestamp: new Date(),
+        date: entryDate, // Midnight of selected date (for grouping by day)
+        timestamp: timestamp, // Exact moment with time (for sorting and intraday tracking)
         energyLevel,
         mood,
         notes: notes || undefined,
@@ -60,13 +70,16 @@ export function EnergyEntryForm() {
         },
       })
 
-      // Reset form
+      // Reset form - keep date/time to allow multiple entries for same moment
       setEnergyLevel(5)
       setMood('neutral')
       setNotes('')
       setSleepFactor(undefined)
       setStressFactor(undefined)
       setHadExercise(false)
+      // Reset date/time to NOW for next entry
+      setDate(getDefaultFormDate())
+      setTime(getDefaultFormTime())
 
       toast.success('Energy level logged successfully!')
     } catch (error) {
@@ -141,6 +154,30 @@ export function EnergyEntryForm() {
               ))}
             </div>
           </div>
+
+          {/* Custom Date & Time - Collapsible */}
+          <Accordion type="single" collapsible>
+            <AccordionItem value="datetime">
+              <AccordionTrigger className="text-sm font-medium">
+                Custom Date & Time (Optional)
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="pt-2">
+                  <DateTimeInput
+                    date={date}
+                    time={time}
+                    onDateChange={setDate}
+                    onTimeChange={setTime}
+                    label="Entry Date & Time"
+                    helpText="Defaults to current moment. Change to log retroactively."
+                    showRelativeLabel={true}
+                    allowFuture={false}
+                    maxPastDays={365}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Optional Details - Collapsible */}
           <Accordion type="single" collapsible>

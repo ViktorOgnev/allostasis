@@ -2,19 +2,21 @@
 
 import { useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
-import { format } from 'date-fns'
+import { format, isSameDay } from 'date-fns'
 import { getEnergyColor, colors } from '@/app/design-tokens/colors'
 import type { EnergyEntry } from '@/types/energy'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChartSkeleton } from './ChartSkeleton'
+import { getTimeLabel } from '@/lib/dateUtils'
 
 interface EnergyLevelChartProps {
   entries: EnergyEntry[]
   days?: number
   isLoading?: boolean
+  showIndividualEntries?: boolean
 }
 
-export function EnergyLevelChart({ entries, days = 7, isLoading = false }: EnergyLevelChartProps) {
+export function EnergyLevelChart({ entries, days = 7, isLoading = false, showIndividualEntries = false }: EnergyLevelChartProps) {
   if (isLoading) {
     return <ChartSkeleton showHeader height={300} />
   }
@@ -26,9 +28,25 @@ export function EnergyLevelChart({ entries, days = 7, isLoading = false }: Energ
 
     const filteredEntries = entries
       .filter(entry => new Date(entry.date) >= cutoffDate)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
 
-    // Group by date and calculate average
+    // If showIndividualEntries is true, show all entries with timestamps (intraday view)
+    if (showIndividualEntries) {
+      // Check if all entries are from the same day
+      const isSingleDay = filteredEntries.length > 0 &&
+        filteredEntries.every(entry => isSameDay(new Date(entry.date), new Date(filteredEntries[0].date)))
+
+      return filteredEntries.map(entry => ({
+        date: isSingleDay
+          ? getTimeLabel(new Date(entry.timestamp))  // Show time for same-day entries
+          : format(new Date(entry.date), 'MMM dd HH:mm'), // Show date+time for multi-day
+        energy: entry.energyLevel,
+        fullDate: new Date(entry.timestamp),
+        timestamp: entry.timestamp,
+      }))
+    }
+
+    // Default: Group by date and calculate average (daily view)
     const groupedByDate = filteredEntries.reduce((acc, entry) => {
       const dateKey = format(new Date(entry.date), 'MMM dd')
       if (!acc[dateKey]) {
@@ -44,7 +62,7 @@ export function EnergyLevelChart({ entries, days = 7, isLoading = false }: Energ
       energy: Math.round((data.total / data.count) * 10) / 10,
       fullDate: data.date,
     }))
-  }, [entries, days])
+  }, [entries, days, showIndividualEntries])
 
   const averageEnergy = useMemo(() => {
     if (chartData.length === 0) return 0
@@ -117,7 +135,12 @@ export function EnergyLevelChart({ entries, days = 7, isLoading = false }: Energ
                   const data = payload[0].payload
                   return (
                     <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                      <p className="text-sm font-medium">{data.date}</p>
+                      <p className="text-sm font-medium">
+                        {showIndividualEntries && data.timestamp
+                          ? format(new Date(data.timestamp), 'MMM dd, yyyy • HH:mm')
+                          : data.date
+                        }
+                      </p>
                       <p className={`text-lg font-bold ${
                         data.energy <= 3 ? 'text-red-500' :
                         data.energy <= 7 ? 'text-yellow-500' :

@@ -3,6 +3,7 @@
 import { format } from 'date-fns'
 import type { EnergyEntry } from '@/types/energy'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getDateLabel, getTimeLabel } from '@/lib/dateUtils'
 
 interface RecentEntriesProps {
   entries: EnergyEntry[]
@@ -70,7 +71,7 @@ export function RecentEntries({ entries, limit = 5 }: RecentEntriesProps) {
                     <span className="text-lg">{getMoodEmoji(entry.mood)}</span>
                   </div>
                   <div className="text-xs text-gray-500">
-                    {format(new Date(entry.timestamp), 'MMM dd, yyyy • HH:mm')}
+                    {getDateLabel(new Date(entry.date))} at {getTimeLabel(new Date(entry.timestamp))}
                   </div>
                 </div>
               </div>
