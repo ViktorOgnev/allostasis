@@ -178,7 +178,14 @@ export function SleepLogForm() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Wake Time</label>
+              <label className="text-sm font-medium">
+                Wake Time
+                {bedtime && wakeTime && wakeTime <= bedtime && (
+                  <span className="text-xs text-blue-600 ml-2">
+                    (Next day)
+                  </span>
+                )}
+              </label>
               <input
                 type="time"
                 value={wakeTime}
@@ -197,7 +204,22 @@ export function SleepLogForm() {
                 {duration} hours
               </span>
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+
+            {/* Show detailed timeline when wake time is next day */}
+            {bedtime && wakeTime && wakeTime <= bedtime && (
+              <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+                <p className="text-xs text-blue-800">
+                  <strong>Sleep Timeline:</strong>
+                </p>
+                <p className="text-xs text-blue-700 mt-1">
+                  {new Date(`${date}T${bedtime}`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {bedtime}
+                  {' → '}
+                  {new Date(new Date(`${date}T${wakeTime}`).getTime() + 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} {wakeTime}
+                </p>
+              </div>
+            )}
+
+            <div className="text-xs text-gray-500 mt-2">
               {duration < 6 && '⚠️ Less than recommended (7-9 hours)'}
               {duration >= 6 && duration < 7 && '⚡ Getting close to recommended'}
               {duration >= 7 && duration <= 9 && '✅ Within recommended range'}

@@ -32,14 +32,14 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="text-center max-w-3xl mx-auto mb-6 md:mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-            EMAL Fitness Tracker
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Allostasis
           </h1>
           <p className="text-base md:text-lg text-gray-600 mb-2">
-            Track energy, sleep, exercise, and stress
+            Adaptive wellbeing tracker that learns what impacts your energy
           </p>
           <p className="text-sm text-gray-500">
-            Simple tracker to help you feel better every day
+            Track sleep, activity, recovery, and stress to optimize your wellbeing
           </p>
         </div>
 
@@ -56,13 +56,14 @@ export default function Home() {
         <Accordion type="single" collapsible className="max-w-4xl mx-auto mt-8">
           <AccordionItem value="about" className="border rounded-lg">
             <AccordionTrigger className="text-sm text-gray-600 px-4">
-              Learn more about EMAL science ▼
+              Learn more about Allostasis ▼
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-3">
                 <p className="text-sm text-gray-600">
-                  EMAL (Energy Management & Allostatic Load) helps you understand how sleep, exercise, and stress management affect your daily energy levels.
-                  Track these metrics to identify patterns and optimize your wellbeing.
+                  Allostasis tracks your body's adaptive responses to stress. The system learns which factors
+                  (sleep, physical load, recovery, psychological stress) most impact your energy, then calculates
+                  your allostatic load - the cumulative wear and tear on your system. Lower load = better balance.
                 </p>
                 <div className="grid grid-cols-2 gap-2 pt-2">
                   <Link href="/energy">
@@ -87,9 +88,9 @@ export default function Home() {
                   </Link>
                 </div>
                 <div className="pt-2">
-                  <Link href="/learn">
+                  <Link href="/allostasis">
                     <Button variant="link" size="sm" className="text-xs">
-                      Read full EMAL guide →
+                      View Allostasis Insights →
                     </Button>
                   </Link>
                 </div>

@@ -8,11 +8,12 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Home', emoji: '🏠' },
+  { href: '/log', label: 'Log', emoji: '📝' },
+  { href: '/allostasis', label: 'Insights', emoji: '📊' },
   { href: '/energy', label: 'Energy', emoji: '⚡' },
   { href: '/sleep', label: 'Sleep', emoji: '😴' },
   { href: '/exercise', label: 'Exercise', emoji: '🏃' },
   { href: '/stress', label: 'Stress', emoji: '🧘' },
-  { href: '/learn', label: 'Learn', emoji: '📚' },
   { href: '/settings', label: 'Settings', emoji: '⚙️' },
 ]
 
@@ -28,10 +29,10 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold">
-              E
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+              A
             </div>
-            <span className="font-bold text-lg">EMAL Tracker</span>
+            <span className="font-bold text-lg">Allostasis</span>
           </Link>
 
           {/* Desktop Navigation */}

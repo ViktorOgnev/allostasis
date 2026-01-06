@@ -36,6 +36,15 @@ export const colors = {
     vigorous: '#A855F7',   // purple-500
   },
 
+  // sALI (Simplified Allostatic Load Index) - lower is better
+  sALI: {
+    optimal: '#10B981',    // emerald-500 (0.0-0.2)
+    good: '#84CC16',       // lime-500 (0.2-0.4)
+    moderate: '#F59E0B',   // amber-500 (0.4-0.6)
+    high: '#EA580C',       // orange-600 (0.6-0.8)
+    critical: '#DC2626',   // red-600 (0.8-1.0)
+  },
+
   // UI Colors
   primary: '#3B82F6',      // blue-500
   secondary: '#8B5CF6',    // violet-500
@@ -85,4 +94,13 @@ export function getStressColor(level: number): string {
 // Helper function to get exercise intensity color
 export function getExerciseColor(intensity: 'low' | 'moderate' | 'high' | 'vigorous'): string {
   return colors.exercise[intensity]
+}
+
+// Helper function to get sALI color (0-1 scale, lower is better)
+export function getsALIColorToken(score: number): string {
+  if (score <= 0.2) return colors.sALI.optimal
+  if (score <= 0.4) return colors.sALI.good
+  if (score <= 0.6) return colors.sALI.moderate
+  if (score <= 0.8) return colors.sALI.high
+  return colors.sALI.critical
 }

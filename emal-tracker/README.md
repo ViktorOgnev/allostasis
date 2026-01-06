@@ -1,18 +1,47 @@
-# EMAL Fitness Tracker
+# Allostasis Tracker
 
-A science-based fitness tracker web application for managing energy through sleep, exercise, stress management, and daily monitoring, based on the **Energy Management Allostatic Load (EMAL)** model.
+An adaptive wellbeing tracker that learns which factors most impact your energy. Monitor your **allostatic load** - the cumulative wear and tear on your body from stress - through intelligent analysis of sleep, physical activity, recovery, and psychological stress patterns.
 
 ## Features
 
-- **Energy Level Tracking**: Track daily energy levels (1-10 scale) with mood and contributing factors
-- **Sleep Tracking**: Log sleep duration, quality, and factors affecting sleep
-- **Exercise Logging**: Record workouts with type, duration, and intensity
-- **Stress Management Tools**:
-  - Breathing exercises (Box Breathing, 4-7-8, etc.)
-  - Gratitude journal
-  - Mindfulness practices
-- **Educational Content**: Learn about the EMAL model, energy sources, and optimization strategies
-- **Data Visualization**: Charts and analytics for tracking trends over time
+### Version 2: Adaptive Allostatic Load Algorithm
+
+- **5-Question Quick Check-In**: Simplified daily tracking (all metrics on 0-10 scale)
+  - Sleep Recovery
+  - Physical Load
+  - Recovery from Load
+  - Psychological Stress
+  - Energy Level (anchor metric)
+
+- **Adaptive Weight Calculation**: System learns what matters most for YOUR wellbeing
+  - Impact Component: Spearman correlation with energy
+  - Volatility Component: Metric instability detection
+  - Imbalance Component: Conflict pattern detection
+
+- **sALI (Simplified Allostatic Load Index)**: 0-1 score showing system strain
+  - Raw sALI with EMA(7) and EMA(28) smoothing
+  - Lower = better balance and recovery
+  - Interpretable breakdown showing what's driving your load
+
+- **Conflict Pattern Detection**: 8 patterns (4 acute + 4 chronic)
+  - High load + low recovery
+  - Poor sleep + high stress
+  - Overwork patterns
+  - Brain fog (60+ day chronic pattern)
+
+- **Insights Dashboard**: Comprehensive analytics at `/allostasis`
+  - sALI trend visualization
+  - Combined metrics chart
+  - Weight breakdown
+  - Personalized recommendations
+
+### Legacy Features (Version 1)
+
+- **Detailed Tracking**: Granular logging for power users
+- **Sleep Tracking**: Duration, quality, and sleep factors
+- **Exercise Logging**: Type, duration, intensity with energy impact
+- **Stress Management**: Breathing exercises, gratitude journal, mindfulness
+- **Data Visualization**: Charts and trend analysis
 
 ## Tech Stack
 
@@ -31,16 +60,37 @@ A science-based fitness tracker web application for managing energy through slee
 ```
 emal-tracker/
 ├── app/                    # Next.js app router pages
+│   ├── allostasis/        # Insights dashboard (Version 2)
+│   ├── log/               # Daily logging page
+│   └── ...                # Legacy pages
 ├── components/             # Reusable React components
+│   ├── charts/            # Visualization components
+│   │   ├── sALITrendChart.tsx
+│   │   ├── CombinedMetricsChart.tsx
+│   │   ├── WeightBreakdownChart.tsx
+│   │   ├── InterpretableFeedback.tsx
+│   │   └── ChronicPatternAlerts.tsx
+│   └── forms/             # Input forms
+│       ├── AllostaticCheckInForm.tsx  # New 5-question form
+│       └── ...            # Legacy forms
 ├── lib/                    # Core library code
-│   ├── db.ts              # Dexie.js database setup
+│   ├── db.ts              # Dexie.js database (AllostatisDatabase)
+│   ├── allostasis/        # Calculation engine (Version 2)
+│   │   ├── spearman.ts    # Correlation & statistics
+│   │   ├── weights.ts     # Adaptive weight calculation
+│   │   ├── conflicts.ts   # Pattern detection
+│   │   ├── sali.ts        # sALI calculation
+│   │   ├── ema.ts         # Exponential moving averages
+│   │   └── calculations.ts # Main orchestrator
 │   └── utils.ts           # Helper functions
 ├── store/                  # Zustand stores
-│   ├── energyStore.ts
+│   ├── allostaticStore.ts # Version 2 store
+│   ├── energyStore.ts     # Legacy stores
 │   ├── sleepStore.ts
 │   ├── exerciseStore.ts
 │   └── stressStore.ts
 ├── types/                  # TypeScript type definitions
+│   ├── allostasis.ts      # Version 2 types
 │   ├── energy.ts
 │   ├── sleep.ts
 │   ├── exercise.ts

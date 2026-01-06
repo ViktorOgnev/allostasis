@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EMAL Fitness Tracker - Energy Management",
-  description: "Science-based fitness tracker for managing energy through sleep, exercise, and stress management based on the EMAL model",
+  title: "Allostasis - Track Your Wellbeing",
+  description: "Adaptive wellbeing tracker that learns which factors most impact your energy. Monitor allostatic load through sleep, activity, recovery, and stress patterns.",
 };
 
 export default function RootLayout({

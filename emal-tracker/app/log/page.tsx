@@ -14,10 +14,14 @@ import { useStressLevelStore } from '@/store/stressLevelStore'
 import { useDailyCheckInStore } from '@/store/dailyCheckInStore'
 import { getEnergyColor, colors } from '@/app/design-tokens/colors'
 import type { SleepQuality } from '@/types/sleep'
+import { AllostaticCheckInForm } from '@/components/forms/AllostaticCheckInForm'
 
 export default function UnifiedDailyLog() {
   const router = useRouter()
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+
+  // Mode toggle: 'quick' (new 5-question form) or 'detailed' (legacy 4-section form)
+  const [mode, setMode] = useState<'quick' | 'detailed'>('quick')
 
   // Track completion status
   const [completed, setCompleted] = useState({
@@ -197,27 +201,65 @@ export default function UnifiedDailyLog() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Daily Log</h1>
-          <div className="flex items-center justify-between">
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="p-2 border rounded"
-            />
-            <div className="text-sm text-gray-600">
-              Progress: <strong>{completedCount}/4</strong> completed
-            </div>
+          <p className="text-gray-600 text-sm mb-4">
+            Track your daily wellbeing and build insights over time
+          </p>
+
+          {/* Mode Toggle */}
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant={mode === 'quick' ? 'default' : 'outline'}
+              onClick={() => setMode('quick')}
+              className="flex-1"
+            >
+              <span className="mr-2">⚡</span>
+              Quick Check-In (5 questions)
+            </Button>
+            <Button
+              variant={mode === 'detailed' ? 'default' : 'outline'}
+              onClick={() => setMode('detailed')}
+              className="flex-1"
+            >
+              <span className="mr-2">🔧</span>
+              Detailed Tracking
+            </Button>
           </div>
+
+          {mode === 'detailed' && (
+            <div className="flex items-center justify-between">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="p-2 border rounded"
+              />
+              <div className="text-sm text-gray-600">
+                Progress: <strong>{completedCount}/4</strong> completed
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
-          <div
-            className="bg-blue-500 h-2 rounded-full transition-all"
-            style={{ width: `${(completedCount / 4) * 100}%` }}
-          />
-        </div>
+        {/* Progress Bar (only for detailed mode) */}
+        {mode === 'detailed' && (
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all"
+              style={{ width: `${(completedCount / 4) * 100}%` }}
+            />
+          </div>
+        )}
 
+        {/* Quick Mode: New 5-Question Form */}
+        {mode === 'quick' && (
+          <div className="flex justify-center">
+            <AllostaticCheckInForm />
+          </div>
+        )}
+
+        {/* Detailed Mode: Legacy 4-Section Form */}
+        {mode === 'detailed' && (
+          <>
         {/* 4 Sections - Collapsible */}
         <div className="space-y-4">
           {/* 1. Energy Section */}
@@ -536,6 +578,8 @@ export default function UnifiedDailyLog() {
               View Dashboard
             </Button>
           </div>
+        )}
+          </>
         )}
       </div>
     </main>

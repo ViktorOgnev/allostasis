@@ -29,13 +29,52 @@ export function StressLogForm() {
   const [notes, setNotes] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Inline validation state
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
   const addEntry = useStressLevelStore((state) => state.addEntry)
+
+  // Validation function
+  const validateField = (name: string, value: any) => {
+    let error = ''
+
+    if (name === 'primaryStressor' && !value) {
+      error = 'Please select a primary stressor'
+    }
+
+    if (name === 'date') {
+      const selectedDate = new Date(value)
+      const today = new Date()
+      today.setHours(23, 59, 59, 999)
+      if (selectedDate > today) {
+        error = 'Date cannot be in the future'
+      }
+    }
+
+    setErrors(prev => ({ ...prev, [name]: error }))
+    return error === ''
+  }
+
+  // Validate all fields
+  const validateForm = () => {
+    const isStressorValid = validateField('primaryStressor', primaryStressor)
+    const isDateValid = validateField('date', date)
+    return isStressorValid && isDateValid
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!primaryStressor) {
-      toast.error('Please select a primary stressor')
+    // Mark all fields as touched
+    setTouched({
+      primaryStressor: true,
+      date: true,
+    })
+
+    // Validate all fields
+    if (!validateForm()) {
+      toast.error('Please fix the errors before submitting')
       return
     }
 
@@ -147,10 +186,26 @@ export function StressLogForm() {
             <input
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-md"
+              onChange={(e) => {
+                setDate(e.target.value)
+                if (touched.date) {
+                  validateField('date', e.target.value)
+                }
+              }}
+              onBlur={() => {
+                setTouched(prev => ({ ...prev, date: true }))
+                validateField('date', date)
+              }}
+              className={`w-full p-2 border rounded-md ${
+                touched.date && errors.date ? 'border-red-500' : 'border-gray-200'
+              }`}
               required
             />
+            {touched.date && errors.date && (
+              <p className="text-sm text-red-500 mt-1" role="alert">
+                ⚠️ {errors.date}
+              </p>
+            )}
           </div>
 
           {/* Time of Day */}
@@ -216,8 +271,19 @@ export function StressLogForm() {
             <select
               required
               value={primaryStressor}
-              onChange={(e) => setPrimaryStressor(e.target.value)}
-              className="w-full p-2 border border-gray-200 rounded-md"
+              onChange={(e) => {
+                setPrimaryStressor(e.target.value)
+                if (touched.primaryStressor) {
+                  validateField('primaryStressor', e.target.value)
+                }
+              }}
+              onBlur={() => {
+                setTouched(prev => ({ ...prev, primaryStressor: true }))
+                validateField('primaryStressor', primaryStressor)
+              }}
+              className={`w-full p-2 border rounded-md ${
+                touched.primaryStressor && errors.primaryStressor ? 'border-red-500' : 'border-gray-200'
+              }`}
             >
               <option value="">Select primary stressor...</option>
               <option value="work">💼 Work/Deadlines</option>
@@ -233,6 +299,11 @@ export function StressLogForm() {
               <option value="exercise">🏃 Lack of Exercise</option>
               <option value="other">🔄 Other</option>
             </select>
+            {touched.primaryStressor && errors.primaryStressor && (
+              <p className="text-sm text-red-500 mt-1" role="alert">
+                ⚠️ {errors.primaryStressor}
+              </p>
+            )}
           </div>
 
           {/* Additional Details - Accordion */}
@@ -376,7 +447,7 @@ export function StressLogForm() {
           <Button
             type="submit"
             className="w-full"
-            disabled={isSubmitting}
+            disabled={isSubmitting || Object.values(errors).some(e => e !== '')}
             loading={isSubmitting}
           >
             {isSubmitting ? 'Logging...' : 'Log Stress Level'}
